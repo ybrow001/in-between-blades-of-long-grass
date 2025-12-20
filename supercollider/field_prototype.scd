@@ -1,38 +1,22 @@
-/*~masterBus = Bus.audio(s, 2);
-
-SynthDef.new(\rmsRegulator,
-	var sigma, rms, gain;
-
-	// receive input from master bus;
-	sigma = In.ar(~masterBus, 2);
-
-	// signal energy regulation using RMS
-	rms = Amplitude.kr(sigma, 1.0, 1.0); // input, attack time, release time
-	gain = 0.2 / max(rms, 0.001); // loudness: target / current (max() to avoid dividing by 0)
-	sigma = sigma * Lag.kr(gain, 1.0); // in, lag time
-
-	// limiting
-	sigma = Limiter.ar(sigma, 0.99);
-
-	Out(0, sigma);
-).add;*/
-
-~pink = SynthDef.new(\pink, { |amp = 0.33, pan = 0, cutoff = 1000, out = 0|
-	var noise, env;
+~pinkNoise = SynthDef.new(\pinkNoise, { |amp = 0.33, pan = 0, cutoff = 1000, out = 0|
+	var noise, env, e;
 
 	noise = PinkNoise.ar(amp);
 
 	noise = LPF.ar(noise, cutoff);
+	noise = HPF.ar(noise, 200);
 
 	env = EnvGen.kr(
-		Env(
+		e = Env(
 			levels: [0.001, 1.0, 0.001],
 			times: [5, 20],
-			curve: \exps
+			curve: [1.0, -1.0]
 		),
 		doneAction: 2
 	);
 	noise = noise * env;
+
+	e.plot();
 
 	noise = Compander.ar( // may not be necessary
 		in: noise,
@@ -45,8 +29,6 @@ SynthDef.new(\rmsRegulator,
 	);
 
 	noise = Pan2.ar(noise, pan);
-
-	// send output to master bus
 	Out.ar(out, noise);
 }).add;
 
@@ -61,7 +43,7 @@ SynthDef.new(\rmsRegulator,
   * **studies on MAA, seemly not using headphones
 */
 
-~genPatterns = {|instances = 5, cutoffIn = 8000|
+~generatePatterns = {|instances = 5, cutoffIn = 8000|
 	var cutoffDecrement = (cutoffIn-800)/instances;
 
 	~patterns = List[];
@@ -82,7 +64,7 @@ SynthDef.new(\rmsRegulator,
 			/*cutoffPattern = cutoffPattern.clip(400,8000); // contain within specified limits*/
 			if(cutoffPattern <= 800) {cutoffPattern = 800};
 
-			~patterns[i][0].add(rrand(20, 50)); // dur
+			~patterns[i][0].add(rrand(20, 30)); // dur
 			~patterns[i][1].add(rrand(-0.9, 0.9)); // pan
 			~patterns[i][2].add(cutoffPattern); // decrement cutoff
 		}
@@ -96,7 +78,7 @@ SynthDef.new(\rmsRegulator,
 
 	for(0,~patterns.size-1) {|i|
 		~pbPatterns.add(Pbind(
-			\instrument, \pink,
+			\instrument, \pinkNoise,
 			\dur, Pseq(~patterns[i][0], inf),
 			\pan, Pseq(~patterns[i][1], inf),
 			\cutoff, Pseq(~patterns[i][2], inf)
@@ -109,20 +91,4 @@ SynthDef.new(\rmsRegulator,
 
 /*~metro = TempoClock.new(1.0);*/
 
-/*
-~playPatterns = {
-	~pbPatterns.do({|pattern|
-		pattern.play(~metro)
-	})
-};
-*/
-
-// ~rmsSynth = Synth(\rmsRegulator, [\out, 0]);
-
 Ppar(~pbPatterns).play;
-
-
-
-// pbind/patterns
-
-// metronomes?
