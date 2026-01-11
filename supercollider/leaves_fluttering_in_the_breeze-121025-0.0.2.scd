@@ -1,4 +1,7 @@
 // leaf flutter - līf flȧte | flattering - flȧtering līvs
+// leaves fluttering in the breeze - līvs flȧtering in þe brīs
+
+// run all functions to initialise before playing
 
 ~melodyVoice = SynthDef.new(\melodyVoice, {
 	arg freq = 261, amp = 0.3, out = 0, pan = 0;
@@ -51,6 +54,7 @@
 	[0.5, 0.5, 0.5, 0.5, 0.5]
 ];
 
+// possibly add rhythmic mode probabilities
 ~rhythmProbs = [
 	[],
 	[],
@@ -499,7 +503,6 @@
 	[~xYDur, ~xYNotes]
 }.value;
 
-(
 ~startMel77 = Pbind(
 	\instrument, \melodyVoice,
 	\freq, Pseq(~xYNotes[0]*0.5, inf),
@@ -555,6 +558,7 @@
 	\dur, 5 /*Pseq([1, 1, 2], inf)*/
 );
 
+Server.default.record;
 
 (
 ~metre48 = TempoClock.new(4.57142857); // layer 6
@@ -575,6 +579,8 @@
 ~startMel53.play(~metre32);
 ~startMel66.play(~metre48);
 );
+
+// Server.default.stopRecording;
 
 ~dynamicStructure = {
 	// start and stop layers

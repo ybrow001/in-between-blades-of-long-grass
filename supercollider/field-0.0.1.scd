@@ -1,3 +1,9 @@
+// field - fiyeld
+
+// run all functions to initialise before playing
+
+// WARNING - DANGEROUS LOUD NOISE HAPPENS SUDDENLY AFTER RUNNING FOR A SHORT WHILE (~ > 60s)
+
 ~pinkNoise = SynthDef.new(\pinkNoise, { |amp = 0.33, pan = 0, cutoff = 1000, out = 0|
 	var noise, env, e;
 
@@ -16,7 +22,7 @@
 	);
 	noise = noise * env;
 
-	e.plot();
+	// e.plot();
 
 	noise = Compander.ar( // may not be necessary
 		in: noise,
@@ -91,4 +97,8 @@
 
 /*~metro = TempoClock.new(1.0);*/
 
+// Server.default.record;
+
 Ppar(~pbPatterns).play;
+
+// Server.default.stopRecording;

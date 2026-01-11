@@ -1,8 +1,11 @@
+// willow branch blessing - wilew branċ blėsing
+
+// run all functions to initialise before playing
 
 ~voice1 = SynthDef.new(\voice1, {
 	arg freq = 261, amp = 0.3, out = 0, pan = 0;
 	var voice, env;
-	voice = LFTri.ar(freq);
+	voice = SinOscFB.ar(freq, 0.167pi);
 	env = EnvGen.kr(
 		Env(
 		[0.001, 1, 0.001],
@@ -16,9 +19,6 @@
 	voice = Pan2.ar(voice, pan);
 	Out.ar(out, voice);
 }).add;
-
-// trigger individual notes with unique envelopes
-
 
 ~majPentFreqs = {|root = 261|
 	var supmaj77Degrees, supmaj77Freqs, upSupmaj77Degrees, upSupmaj77Freqs, edo77,
@@ -143,11 +143,15 @@
 	\pan, Pseq(~noteSeq[3][2], inf)
 );
 
+// Server.default.record;
+
 ~playNoteHigh1.play;
 ~playNoteHigh2.play;
 ~playNote1.play;
 ~playNote2.play;
 ~playBass.play;
+
+/*Server.default.stopRecording;*/
 
 /*
 ideas / things to do:
